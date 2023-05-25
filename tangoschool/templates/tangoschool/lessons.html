@@ -1,0 +1,15 @@
+{% extends 'tangoschool/base.html' %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    <ul class="list-articles">
+        {% for ls in lessons %}
+            <li>
+                <div class="article-panel">
+                    <a href="{{ ls.get_absolute_url }}">
+                        <h5> {{ ls.date }} {{ ls.time }} {{ ls.lesson_type }} {{ ls.level }} {{ ls.trainer }}</h5></a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

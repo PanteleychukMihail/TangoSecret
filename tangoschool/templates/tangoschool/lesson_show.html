@@ -1,0 +1,17 @@
+{% extends 'tangoschool/base.html' %}
+
+{% block content %}
+<h1> {{ title }}</h1>
+
+
+    <h2>{{ lesson.date }}  {{ lesson.time }}</h2>
+    <h2>{{ lesson.lesson_type }}  {{ lesson.level }}</h2>
+    <h2>{{ lesson.trainer }}  {{ lesson.lesson_topic }}</h2>
+   {% for student in students %}
+       {{ student }}
+   {% endfor %}
+
+
+
+
+{% endblock %}
