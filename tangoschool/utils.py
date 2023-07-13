@@ -1,9 +1,10 @@
 from .models import *
 
-menu = [{'title': 'Добавить Ученика', 'url_name': 'add_student'},
+menu = [{'title': 'Новый Ученик', 'url_name': 'add_student'},
         {'title': 'Список учеников', 'url_name': 'users_list'},
-        {'title': 'Создать урок', 'url_name': 'add_lesson'},
-        {'title': 'Список уроков', 'url_name': 'lessons_view'},
+        {'title': 'Создать занятие', 'url_name': 'add_lesson'},
+        {'title': 'Создать практику', 'url_name': 'add_practice'},
+        {'title': 'Прошлые уроки', 'url_name': 'lessons_view'},
         {'title': 'Редактировать профиль', 'url_name': 'user_update'}
         ]
 
@@ -20,6 +21,6 @@ class DataMixin:
             context['menu'] = user_menu
 
         if self.request.user.is_authenticated and self.request.user.is_staff:
-            user_menu.pop(4)
+            user_menu.pop(5)
         context['menu'] = user_menu
         return context

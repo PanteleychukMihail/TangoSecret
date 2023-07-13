@@ -10,9 +10,19 @@ class LoginUserForm(AuthenticationForm):
 
 
 class AddStudentForm(forms.ModelForm):
+    balance_choice = forms.ChoiceField(label='Тип учетной записи',
+                                       choices=[('new', 'Создать новую учетную запись'),
+                                                ('existing', 'Выбрать существующую')],
+                                       widget=forms.RadioSelect  # Используем радиокнопки для выбора
+                                       )
+    existing_balance = forms.ModelChoiceField(label='Тип учетной записи', queryset=Account.objects.all(),
+                                              required=False,  # Делаем поле необязательным
+                                              empty_label='Выберите учетную запись')
+    initial_balance = forms.IntegerField(required=False, label='Начальный баланс', initial=0)
+
     class Meta:
         model = Student
-        fields = '__all__'
+        exclude = ['student_balance']
 
 
 class BuyLessonsForm(forms.Form):
@@ -20,28 +30,43 @@ class BuyLessonsForm(forms.Form):
 
 
 class AddLessonForm(forms.ModelForm):
-    level = forms.ChoiceField(choices=LEVEL_CHOICES, widget=forms.RadioSelect, required=True)
+    level = forms.ChoiceField(label='Уровень группы', choices=LEVEL_CHOICES, widget=forms.RadioSelect, required=True)
     students = forms.ModelMultipleChoiceField(
-        queryset=Student.objects.filter(is_active=True).order_by('level', 'user'),
+        label='Ученики',
+        queryset=Student.objects.filter(is_active=True).order_by('level', 'last_name'),
         widget=forms.CheckboxSelectMultiple,
-        required=False
-    )
+        required=False)
 
     def __init__(self, *args, **kwargs):
         super(AddLessonForm, self).__init__(*args, **kwargs)
         self.fields['level'].initial = 'advanced'
-
-        for student in self.fields['students'].queryset:
-            self.fields[f'family_{student.pk}'] = forms.BooleanField(
-                label=f'Удвоение для {student}',
-                required=False,
-                widget=forms.CheckboxInput()
-            )
+        self.fields['lesson_type'].widget = forms.HiddenInput()
+        self.fields['lesson_type'].initial = 'full'
 
     class Meta:
         model = Lesson
-        fields = ['trainer', 'lesson_topic', 'lesson_type', 'level', 'students']
+        fields = ['lesson_type', 'lesson_topic', 'trainer1', 'trainer2', 'level', 'students']
 
+
+class AddPracticeForm(forms.ModelForm):
+    students = forms.ModelMultipleChoiceField(
+        queryset=Student.objects.filter(is_active=True).order_by('-level', 'last_name'),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    guests = forms.ModelMultipleChoiceField(
+        queryset=Guest.objects.all(), widget=forms.CheckboxSelectMultiple, required=False
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(AddPracticeForm, self).__init__(*args, **kwargs)
+        self.fields['lesson_type'].widget = forms.HiddenInput()
+        self.fields['lesson_type'].initial = 'practice'
+
+    class Meta:
+        model = Lesson
+        fields = ['lesson_type', 'students', 'guests']
 
 # class UpdateUserForm(forms.ModelForm):
 #     model = User

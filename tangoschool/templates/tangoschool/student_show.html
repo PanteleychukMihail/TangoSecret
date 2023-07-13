@@ -6,11 +6,18 @@
     <p> <img class="img-article-left" src="{{ student.photo.url}}" alt="фото"></p>
     {% endif %}
 
-    <h2>{{ student.last_name }}  {{ student.first }}</h2>
+    <h2>{{ student.last_name }}  {{ student.first_name }}</h2>
     <h2>День рождения -  {{ student.birth_day }}</h2>
     <h2>Уровень -  {{ student.level }}</h2>
-    <h2>Остаток занятий -  {{ student.lessons_balance }}</h2>
+    <h2>Остаток занятий -  {{  student.student_balance.balance }}</h2>
     <a href="{% url 'buy_lessons' pk=student.pk %}" class="btn btn-primary">Добавить занятия</a>
+     <h2>Список операций с балансом:</h2>
+    <ul>
+        {% for operation in student.student_balance.operations.all %}
+            <li>{{ operation.get_operation_type_display }} - {{ operation.date }} {{operation.time }}</li>
+        {% endfor %}
+    </ul>
+
 
 
 {% endblock %}

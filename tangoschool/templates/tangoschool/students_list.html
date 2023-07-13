@@ -3,22 +3,21 @@
 {% block content %}
     <h2>{{ title }}</h2>
     <ul class="list-articles">
-        {% for st in students %}
+        {% for student in students %}
             <li>
                 <div class="article-panel">
-                    {% if st.photo %}
-    <p> <img class="img-article-left" src="{{ st.photo.url}}" alt="фото"></p>
-    {% endif %}
-                    <a href="{{ st.get_absolute_url }}"><h5> {{ st.name }} {{ st.last_name }}</h5></a>
-                    <p class="first">Остаток занятий: {{ st.lessons_balance }}</p>
-                    <p class="last">Телефон: {{ st.phone_number }}</p>
-
-
-
+                    {% if student.photo %}
+                        <p><img class="img-article-left" src="{{ student.photo.url }}" alt="фото"></p>
+                    {% endif %}
+                    <a href="{{ student.get_absolute_url }}"><h5>{{ student.first_name }} {{ student.last_name }}</h5></a>
+                    {% if student.student_balance %}
+                        <p class="first">Остаток занятий: {{ student.student_balance.balance }}</p>
+                    {% else %}
+                        <p class="first">Остаток занятий: Не указан</p>
+                    {% endif %}
+                    <p class="last">Телефон: {{ student.phone_number }}</p>
                 </div>
-
             </li>
         {% endfor %}
-
     </ul>
 {% endblock %}

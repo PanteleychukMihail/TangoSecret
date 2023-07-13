@@ -1,15 +1,12 @@
-from datetime import datetime
-
-from django.contrib.auth import logout, login
+from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseNotFound
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views import View, generic
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import LoginUserForm, AddStudentForm, AddLessonForm, BuyLessonsForm
-from .models import *
+from .forms import LoginUserForm, AddStudentForm, AddLessonForm, BuyLessonsForm, AddPracticeForm
 from .utils import *
 
 
@@ -23,10 +20,37 @@ class SchoolHome(DataMixin, TemplateView):
 
 
 class AddStudent(LoginRequiredMixin, DataMixin, CreateView):
-    model = User
+    model = Student
     form_class = AddStudentForm
     template_name = 'tangoschool/student_add.html'
     success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        balance_choice = form.cleaned_data.get('balance_choice')
+        initial_balance = form.cleaned_data.get('initial_balance')
+
+        if balance_choice == 'new':
+            balance = Account.objects.create()
+            if initial_balance:
+                Operation.objects.create(
+                    operation_type='buying',
+                    lesson_balance=balance,
+                    amount=initial_balance
+                )
+
+        else:
+            existing_balance = form.cleaned_data.get('existing_balance').id
+            balance = Account.objects.get(id=existing_balance)
+            if initial_balance:
+                Operation.objects.create(
+                    operation_type='buying',
+                    lesson_balance=balance,
+                    amount=initial_balance
+                )
+
+        form.instance.student_balance = balance
+
+        return super().form_valid(form)
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,6 +78,10 @@ class ShowStudent(LoginRequiredMixin, DataMixin, DetailView):
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Информация о студенте")
+        student = self.get_object()
+        balance = student.student_balance
+        balance_value = balance.balance
+        context['balance'] = balance_value
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -71,18 +99,21 @@ class BuyLessonsView(DataMixin, View):
 
     def post(self, request, pk):
         student = Student.objects.get(pk=pk)
+        balance = student.student_balance
         form = self.form_class(request.POST)
         if form.is_valid():
             lessons = form.cleaned_data['lessons']
-            student.lessons_balance += lessons
-            student.save()
-            return redirect('student', pk=pk)
+            if balance:
+                Operation.objects.create(
+                    operation_type='buying',
+                    lesson_balance=balance,
+                    amount=lessons
+                )
+                balance.save()
         else:
-            context = {
-                'title': f'Покупка занятий для ученика {student}',
-                'form': form
-            }
-            return render(request, self.template_name, context)
+            existing_balance = form.cleaned_data.get('existing_balance').id
+            Account.objects.get(id=existing_balance)
+        return redirect('student', pk=pk)
 
 
 # class StudentUpdate(LoginRequiredMixin, DataMixin, DetailView):
@@ -100,27 +131,60 @@ class LessonCreateView(LoginRequiredMixin, DataMixin, CreateView):
     success_url = reverse_lazy('home')
 
     def form_valid(self, form):
-        lesson = form.save()
-        lesson.trainer = form.cleaned_data.get('trainer')
+        lesson = form.save(commit=False)
+        lesson.trainer1 = form.cleaned_data.get('trainer1')
+        lesson.trainer2 = form.cleaned_data.get('trainer2')
         students = form.cleaned_data.get('students')
+        lesson_level = form.cleaned_data.get('level')
 
         for student in students:
-            count = 1
-            family_key = f'family_{student.pk}'
-            is_family = self.request.POST.get(family_key) == 'on'
+            if lesson.level == 'advanced':
+                balance = student.student_balance
+                operation = Operation.objects.create(
+                    operation_type='visiting',
+                    lesson_balance=student.student_balance,
+                    amount=1
+                )
+                balance.save()
+            else:
+                if student.level == 'beginner':
+                    balance = student.student_balance
+                    operation = Operation.objects.create(
+                        operation_type='visiting',
+                        lesson_balance=student.student_balance,
+                        amount=1
+                    )
+                    balance.save()
+        return super().form_valid(form)
 
-            if is_family:
-                count *= 2  # Multiply the count by 2 for students with family checkbox checked
+    def get_context_data(self, *, objects_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Добавить занятие")
+        return dict(list(context.items()) + list(c_def.items()))
 
-            if lesson.lesson_type == 'full':
-                student.lessons_balance -= 1 * count
-            elif lesson.lesson_type == 'practice':
-                student.lessons_balance -= 0.5 * count
 
-            student.save()
+class PracticeCreateView(LoginRequiredMixin, DataMixin, CreateView):
+    model = Lesson
+    form_class = AddPracticeForm
+    template_name = 'tangoschool/practice_create.html'
+    success_url = reverse_lazy('home')
 
-        lesson.save()
-        return redirect('home')
+    def form_valid(self, form):
+        lesson = form.save(commit=False)
+        students = form.cleaned_data.get('students')
+        guests = form.cleaned_data.get('guests')
+        guests_total_money = len(guests) * 75
+
+        for student in students:
+            balance = student.student_balance
+            operation = Operation.objects.create(
+                operation_type='visiting',
+                lesson_balance=student.student_balance,
+                amount=0.5
+            )
+            balance.save()
+        lesson.guests_total_money = guests_total_money
+        return super().form_valid(form)
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -148,8 +212,9 @@ class LessonShow(LoginRequiredMixin, DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         lesson = self.get_object()
         students = lesson.students.all()
-        print(students)
+        guests = lesson.guests.all()
         context['students'] = students
+        context['guests'] = guests
         c_def = self.get_user_context(title="Информация об уроке")
         return dict(list(context.items()) + list(c_def.items()))
 

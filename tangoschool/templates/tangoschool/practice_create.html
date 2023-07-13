@@ -1,13 +1,12 @@
 {% extends 'tangoschool/base.html' %}
 {% load static %}
 {% block content %}
-    <h1>Создать урок</h1>
+    <h1>Создать практику</h1>
 
     <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Сохранить</button>
     </form>
-    <script src="{% static 'tangoschool/js/script.js' %}"></script>
 
 {% endblock %}

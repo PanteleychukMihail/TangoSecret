@@ -3,11 +3,37 @@
 {% block content %}
     <h2>{{ title }}</h2>
     <ul class="list-articles">
+    <h5>
+                                <span style="display: inline-block; width: 200px;"> Дата</span>
+                                <span style="display: inline-block; width: 100px;">Время</span>
+                                <span style="display: inline-block; width: 150px;">Тип занятия</span>
+                                <span style="display: inline-block; width: 150px;">Уровень</span>
+                                <span style="display: inline-block; width: 200px;">Тренер 1</span>
+                                <span style="display: inline-block; width: 200px;">Тренер 2</span>
+                                <span>Тема занятия</span>
+                            </h5>
         {% for ls in lessons %}
             <li>
                 <div class="article-panel">
                     <a href="{{ ls.get_absolute_url }}">
-                        <h5> {{ ls.date }} {{ ls.time }} {{ ls.lesson_type }} {{ ls.level }} {{ ls.trainer }}</h5></a>
+                        {% if ls.lesson_type == 'full' %}
+                        <h5>
+                                <span style="display: inline-block; width: 200px;">{{ ls.date }}</span>
+                                <span style="display: inline-block; width: 100px;">{{ ls.time }}</span>
+                                <span style="display: inline-block; width: 150px;">{{ ls.get_lesson_type_display }}</span>
+                                <span style="display: inline-block; width: 150px;">{{ ls.get_level_display }}</span>
+                                <span style="display: inline-block; width: 200px;">{{ ls.trainer2 }}</span>
+                                <span style="display: inline-block; width: 200px;">{{ ls.trainer1 }}</span>
+                                <span>{{ ls.lesson_topic }}</span>
+                            </h5>
+                        {% else %}
+                            <h5>
+                                <span style="display: inline-block; width: 200px;">{{ ls.date }}</span>
+                                <span style="display: inline-block; width: 100px;">{{ ls.time }}</span>
+                                <span style="display: inline-block; width: 150px;">{{ ls.get_lesson_type_display }}</span>
+                            </h5>
+                        {% endif %}
+                    </a>
                 </div>
             </li>
         {% endfor %}
