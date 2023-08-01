@@ -85,19 +85,10 @@ class AccountAdmin(admin.ModelAdmin):
     students_list.short_description = 'Студенты'  # Название колонки в админке
     students_list.admin_order_field = 'students__last_name'  # Сортировка по фамилии студента
 
-    # fieldsets = (
-    #     (None, {
-    #         'fields': ('balance',),
-    #     }),
-    #     ('Студенты', {
-    #         'fields': ('students',),
-    #     }),
-    # )
-
 
 class OperationAdmin(admin.ModelAdmin):
     list_display = ('operation_type', 'student_name', 'amount', 'date', 'time')
-    ordering = ('-date','-time')
+    ordering = ('-date', '-time')
 
 
 class LessonAdmin(admin.ModelAdmin):
@@ -107,6 +98,46 @@ class LessonAdmin(admin.ModelAdmin):
     filter_horizontal = ("students", 'guests')
     list_filter = ("lesson_type", 'level')
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        students_before = set(obj.students.all())
+
+        if 'students' in form.changed_data:
+            students_after = set(form.cleaned_data['students'])
+            added_students = students_after - students_before
+            deleted_students = students_before - students_after
+
+            # Добавление операций для новых студентов
+            for student in added_students:
+                if obj.lesson_type == 'practice':
+                    amount = 0.5
+                else:
+                    amount = 1
+
+                operation_date = obj.date
+                operation_time = obj.time
+
+                Operation.objects.create(
+                    operation_type='visiting',
+                    lesson_balance=student.student_balance,
+                    amount=amount,
+                    date=operation_date,
+                    time=operation_time
+
+                )
+
+            # Удаление операций для удаленных студентов
+            for student in deleted_students:
+                start_datetime = datetime.combine(obj.date, obj.time) - timedelta(seconds=5)
+                end_datetime = datetime.combine(obj.date, obj.time) + timedelta(seconds=5)
+                operations = Operation.objects.filter(
+                    lesson_balance=student.student_balance,
+                    date=obj.date,
+                    time__range=(start_datetime, end_datetime)
+                )
+                operations.delete()
+
 
 admin.site.register(TrainerProfile, TrainerAdmin)
 admin.site.register(Student, StudentAdmin)
@@ -115,67 +146,4 @@ admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Operation, OperationAdmin)
 
-# class LessonAdmin(admin.ModelAdmin):
-# def save_model(self, request, obj, form, change):
-#     lesson = form.save(commit=False)
-#
-#     if change:  # Проверяем, является ли это изменением существующего объекта
-#         old_lesson = Lesson.objects.get(pk=lesson.pk)  # Получаем старый объект урока
-#
-#         if old_lesson.lesson_type != lesson.lesson_type:  # Проверяем изменение типа урока
-#             students = form.cleaned_data.get('students')
-#
-#             for student in students:
-#                 count = 2 if form.cleaned_data.get(f'family_{student.pk}') else 1
-#
-#                 if old_lesson.lesson_type == 'full':
-#                     student.lessons_balance += 0.5 * count  # Возвращаем 0.5 к балансу, если  тип был 'full'
-#
-#                 elif old_lesson.lesson_type == 'practice':
-#                     student.lessons_balance -= 0.5 * count  # Возвращаем 1.0 к балансу, если  тип был 'practice'
-#
-#                 student.save()
-#
-#         old_students = old_lesson.students.all()
-#         new_students = form.cleaned_data['students']
-#
-#         # Проверяем добавленных студентов
-#         for student in new_students:
-#             count = 2 if form.cleaned_data.get(f'family_{student.pk}') else 1
-#             if student not in old_students:
-#                 if lesson.lesson_type == 'full':
-#                     student.lessons_balance -= 1 * count
-#                 elif lesson.lesson_type == 'practice':
-#                     student.lessons_balance -= 0.5 * count
-#
-#                 student.save()
-#
-#         # Проверяем удаленных студентов
-#         for student in old_students:
-#             count = 2 if form.cleaned_data.get(f'family_{student.pk}') else 1
-#             if student not in new_students:
-#                 if lesson.lesson_type == 'full':
-#                     student.lessons_balance += 1 * count
-#                 elif lesson.lesson_type == 'practice':
-#                     student.lessons_balance += 0.5 * count
-#
-#                 student.save()
-#     else:
-#         students = form.cleaned_data.get('students')
-#         for student in students:
-#             count = 2 if form.cleaned_data.get(f'family_{student.pk}') else 1
-#             if lesson.level == 'advanced':
-#                 if lesson.lesson_type == 'full':
-#                     student.lessons_balance -= 1 * count
-#                 elif lesson.lesson_type == 'practice':
-#                     student.lessons_balance -= 0.5 * count
-#             elif lesson.level == 'beginner' and student.level == 'Начинающий':
-#                 if lesson.lesson_type == 'full':
-#                     student.lessons_balance -= 1 * count
-#                 elif lesson.lesson_type == 'practice':
-#                     student.lessons_balance -= 0.5 * count
-#
-#             student.save()
-#
-#     lesson.save()
-#     form.save_m2m()
+

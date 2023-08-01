@@ -23,7 +23,7 @@ class AddStudent(LoginRequiredMixin, DataMixin, CreateView):
     model = Student
     form_class = AddStudentForm
     template_name = 'tangoschool/student_add.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('users_list')
 
     def form_valid(self, form):
         balance_choice = form.cleaned_data.get('balance_choice')
@@ -49,7 +49,6 @@ class AddStudent(LoginRequiredMixin, DataMixin, CreateView):
                 )
 
         form.instance.student_balance = balance
-
         return super().form_valid(form)
 
     def get_context_data(self, *, objects_list=None, **kwargs):
@@ -79,9 +78,11 @@ class ShowStudent(LoginRequiredMixin, DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Информация о студенте")
         student = self.get_object()
+        operations = student.student_balance.operations.all().order_by('-date', '-time')
         balance = student.student_balance
         balance_value = balance.balance
         context['balance'] = balance_value
+        context['operations'] = operations
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -116,19 +117,11 @@ class BuyLessonsView(DataMixin, View):
         return redirect('student', pk=pk)
 
 
-# class StudentUpdate(LoginRequiredMixin, DataMixin, DetailView):
-#     model = User
-#
-#     form_class = UpdateUserForm
-#     template_name = 'tangoschool/student_update.html'
-#     success_url = reverse_lazy('home')
-#     pk_url_kwarg = 'slug'
-
 class LessonCreateView(LoginRequiredMixin, DataMixin, CreateView):
     model = Lesson
     form_class = AddLessonForm
     template_name = 'tangoschool/lesson_create.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('lessons_view')
 
     def form_valid(self, form):
         lesson = form.save(commit=False)
@@ -147,7 +140,8 @@ class LessonCreateView(LoginRequiredMixin, DataMixin, CreateView):
                 )
                 balance.save()
             else:
-                if student.level == 'beginner':
+
+                if student.level == 'Начинающий':
                     balance = student.student_balance
                     operation = Operation.objects.create(
                         operation_type='visiting',
@@ -167,7 +161,7 @@ class PracticeCreateView(LoginRequiredMixin, DataMixin, CreateView):
     model = Lesson
     form_class = AddPracticeForm
     template_name = 'tangoschool/practice_create.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('lessons_view')
 
     def form_valid(self, form):
         lesson = form.save(commit=False)
@@ -192,7 +186,7 @@ class PracticeCreateView(LoginRequiredMixin, DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class LessonsViews(DataMixin, ListView):
+class LessonsViews(LoginRequiredMixin, DataMixin, ListView):
     model = Lesson
     template_name = 'tangoschool/lessons.html'
     context_object_name = 'lessons'
@@ -237,21 +231,12 @@ def logout_user(request):
     return redirect('login')
 
 
-# class RegisterUser(DataMixin, CreateView):
-#     form_class = RegisterUserForm
-#     template_name = 'tangoschool/student_update.html'
-#     success_url = reverse_lazy('login')
-#
-#     def form_valid(self, form):
-#         user = form.save()
-#         login(self.request, user)
-#         return redirect('home')
-#
-#     def get_context_data(self, *, objects_list=None, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         c_def = self.get_user_context(title="Регистрация")
-#         return dict(list(context.items()) + list(c_def.items()))
-
-
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1> Страница не найдена </h1>')
+
+# class StudentUpdate(LoginRequiredMixin, DataMixin, DetailView):
+#     model = User#
+#     form_class = UpdateUserForm
+#     template_name = 'tangoschool/student_update.html'
+#     success_url = reverse_lazy('home')
+#     pk_url_kwarg = 'slug'

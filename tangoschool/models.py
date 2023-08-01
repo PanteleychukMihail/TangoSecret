@@ -1,8 +1,11 @@
+from datetime import timedelta, datetime
 from uuid import uuid4
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
+from jedi.inference.value import instance
 
 LEVEL_CHOICES = (
     ('beginner', 'Начинающий'),
@@ -64,8 +67,8 @@ class Operation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     operation_type = models.CharField(max_length=10, choices=[("buying", 'Покупка'), ('visiting', 'Посещение')],
                                       verbose_name="Операция с балансом")
-    date = models.DateField(auto_now_add=True, verbose_name="Дата операции")
-    time = models.TimeField(auto_now_add=True, verbose_name="Время операции")
+    date = models.DateField(verbose_name="Дата операции")
+    time = models.TimeField(verbose_name="Время операции")
     lesson_balance = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='operations')
     amount = models.FloatField(default=1, verbose_name="количество за раз")
 
@@ -78,6 +81,13 @@ class Operation(models.Model):
         return ', '.join(names)
 
     student_name.short_description = 'Студент'
+
+    def save(self, *args, **kwargs):
+        if not self.date:
+            self.date = datetime.now().date()  # Устанавливаем текущую дату, если она не указана
+        if not self.time:
+            self.time = datetime.now().time()  # Устанавливаем текущее время, если оно не указано
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Operation: {self.operation_type} - {self.date} - {self.student_name()}"
@@ -107,13 +117,6 @@ class Student(models.Model):
     def get_absolute_url(self):
         return reverse('student', kwargs={'pk': self.id})
 
-    # def delete(self, *args, **kwargs):
-    #     # Проверяем, сколько студентов связано с LessonBalance
-    #     related_students = self.student_balance.students.count()
-    #     if related_students == 1:
-    #         # Если связан только один студент, удаляем LessonBalance
-    #         self.student_balance.delete()
-    #     super().delete(*args, **kwargs)
 
 
 class Lesson(models.Model):
@@ -142,3 +145,5 @@ class Lesson(models.Model):
 
     def get_absolute_url(self):
         return reverse('lesson', kwargs={'pk': self.id})
+
+

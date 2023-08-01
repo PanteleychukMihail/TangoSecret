@@ -1,3 +1,5 @@
+from datetime import timedelta, datetime
+
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_delete, post_delete, pre_save
 from django.dispatch import receiver
@@ -41,8 +43,14 @@ def update_student_balance_on_delete(sender, instance, **kwargs):
     balance.save()
 
 
-# @receiver(post_delete, sender=Student)
-# def delete_account_with_student(sender, instance):
-#     account = instance.student_balance
-#     if not account:
-#         account.del()
+@receiver(pre_delete, sender=Lesson)
+def delete_related_operations(sender, instance, **kwargs):
+    start_datetime = datetime.combine(instance.date, instance.time) - timedelta(seconds=10)
+    end_datetime = datetime.combine(instance.date, instance.time) + timedelta(seconds=10)
+    operations = Operation.objects.filter(
+        lesson_balance__in=instance.students.values('student_balance'),
+        date=instance.date,
+        time__range=(start_datetime, end_datetime)
+    )
+
+    operations.delete()

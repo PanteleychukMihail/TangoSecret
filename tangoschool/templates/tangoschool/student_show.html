@@ -7,17 +7,14 @@
     {% endif %}
 
     <h2>{{ student.last_name }}  {{ student.first_name }}</h2>
-    <h2>День рождения -  {{ student.birth_day }}</h2>
-    <h2>Уровень -  {{ student.level }}</h2>
-    <h2>Остаток занятий -  {{  student.student_balance.balance }}</h2>
+    <h3>День рождения -  {{ student.birth_day }}</h3>
+    <h3>Уровень -  {{ student.level }}</h3>
+    <h3>Остаток занятий -  {{  student.student_balance.balance }}</h3>
     <a href="{% url 'buy_lessons' pk=student.pk %}" class="btn btn-primary">Добавить занятия</a>
      <h2>Список операций с балансом:</h2>
     <ul>
-        {% for operation in student.student_balance.operations.all %}
+        {% for operation in operations %}
             <li>{{ operation.get_operation_type_display }} - {{ operation.date }} {{operation.time }}</li>
         {% endfor %}
     </ul>
-
-
-
 {% endblock %}
