@@ -4,20 +4,29 @@
     <h2>{{ title }}</h2>
     <ul class="list-articles">
         {% for student in students %}
-            <li>
+
                 <div class="article-panel">
-                    {% if student.photo %}
-                        <p><img class="img-article-left" src="{{ student.photo.url }}" alt="фото"></p>
-                    {% endif %}
-                    <a href="{{ student.get_absolute_url }}"><h5>{{ student.first_name }} {{ student.last_name }}</h5></a>
-                    {% if student.student_balance %}
-                        <p class="first">Остаток занятий: {{ student.student_balance.balance }}</p>
-                    {% else %}
-                        <p class="first">Остаток занятий: Не указан</p>
-                    {% endif %}
-                    <p class="last">Телефон: {{ student.phone_number }}</p>
-                </div>
+<li>
+ <a href="{{ student.get_absolute_url }}"><h5> {{ student.last_name }} {{ student.first_name }}</h5>
+                    </a>
+                    <div class="info-container">
+
+                        {% if student.student_balance %}
+                            <p class="first">Остаток занятий: {{ student.student_balance.balance }}</p>
+                        {% else %}
+                            <p class="first">Остаток занятий: Не указан</p>
+                        {% endif %}
+                        <p class="last">Телефон: {{ student.phone_number }}</p>
+                    </div>
+{#                {% if student.photo %}#}
+{#                        <div class="image-container">#}
+{#                            <img class="img-article-students" src="{{ student.photo.url }}" alt="фото">#}
+{#                        </div>#}
+{##}
+{#                    {% endif %}#}
             </li>
+                </div>
+
         {% endfor %}
     </ul>
 {% endblock content %}
