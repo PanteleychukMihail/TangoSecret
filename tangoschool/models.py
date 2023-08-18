@@ -16,7 +16,7 @@ LEVEL_CHOICES = (
 class TrainerProfile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='trainer_profile')
-    email = models.EmailField(max_length=70, unique=True, verbose_name="Почта")
+    email = models.EmailField(max_length=70, verbose_name="Почта")
     birth_day = models.DateField(blank=True, null=True, verbose_name="День рождения")
     phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True, verbose_name="Номер телефона")
     description = models.TextField(blank=True, verbose_name="Описание")
@@ -109,10 +109,10 @@ class Student(models.Model):
     class Meta:
         verbose_name = 'Ученик'
         verbose_name_plural = 'Ученики'
-        ordering = ['-is_active', 'last_name']
+        ordering = ['-is_active', 'level', 'last_name']
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.level}) "
+        return f"{self.last_name} {self.first_name}  ({self.level}) "
 
     def get_absolute_url(self):
         return reverse('student', kwargs={'pk': self.id})

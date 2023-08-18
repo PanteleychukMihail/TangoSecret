@@ -33,7 +33,7 @@ class AddLessonForm(forms.ModelForm):
     level = forms.ChoiceField(label='Уровень группы', choices=LEVEL_CHOICES, widget=forms.RadioSelect, required=True)
     students = forms.ModelMultipleChoiceField(
         label='Ученики',
-        queryset=Student.objects.filter(is_active=True).order_by('level', 'last_name'),
+        queryset=Student.objects.filter(is_active=True).order_by('-level', '-last_name'),
         widget=forms.CheckboxSelectMultiple,
         required=False)
 
@@ -50,7 +50,7 @@ class AddLessonForm(forms.ModelForm):
 
 class AddPracticeForm(forms.ModelForm):
     students = forms.ModelMultipleChoiceField(
-        queryset=Student.objects.filter(is_active=True).order_by('-level', 'last_name'),
+        queryset=Student.objects.filter(is_active=True).order_by('level', 'last_name'),
         widget=forms.CheckboxSelectMultiple,
         required=False
     )

@@ -36,7 +36,7 @@ class StudentForm(forms.ModelForm):
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'level', 'is_active', 'get_balance', 'birth_day', 'phone_number',)
-    list_editable = ('level', 'is_active')
+    list_editable = ('level', 'is_active','phone_number')
     ordering = ('-is_active', '-level')
     search_fields = ('last_name',)
     list_filter = ("is_active", 'level')
@@ -47,6 +47,8 @@ class StudentAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         initial_balance = form.cleaned_data.get('initial_balance')
+        if not initial_balance:
+            initial_balance = 0
         lesson_balance = form.cleaned_data.get('student_balance')
         if not lesson_balance:
             lesson_balance = Account.objects.create()
@@ -55,13 +57,13 @@ class StudentAdmin(admin.ModelAdmin):
 
             super().save_model(request, obj, form, change)
 
-            if initial_balance:
+            if initial_balance > 0:
                 Operation.objects.create(
                     operation_type='buying',
                     lesson_balance=obj.student_balance,
                     amount=initial_balance
                 )
-        else:
+        elif lesson_balance and initial_balance > 0:
             Operation.objects.create(
                 operation_type='buying',
                 lesson_balance=lesson_balance,

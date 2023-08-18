@@ -3,30 +3,38 @@
 {% block content %}
     <h2>{{ title }}</h2>
     <ul class="list-articles">
-        {% for student in students %}
+        <h5>
+            <span style="display: inline-block; width: 200px;"> Фамилия</span>
+            <span style="display: inline-block; width: 200px;"> Имя </span>
+            <span style="display: inline-block; width: 150px;"> Уровень </span>
+            <span style="display: inline-block; width: 200px;"> Остаток занятий </span>
+        </h5>
 
+
+
+            {% for student in students %}
+                <li>
                 <div class="article-panel">
-<li>
- <a href="{{ student.get_absolute_url }}"><h5> {{ student.last_name }} {{ student.first_name }}</h5>
+                    <a href="{{ student.get_absolute_url }}">
+                        <h5>
+                                <span style="display: inline-block; width: 200px;">{{ student.last_name }}</span>
+                                <span style="display: inline-block; width: 200px;">{{ student.first_name }}</span>
+                                <span style="display: inline-block; width: 150px;">{{ student.level }}</span>
+                                <span style="display: inline-block; width: 200px;">{{ student.student_balance.balance }}</span>
+
+                        </h5>
+
                     </a>
-                    <div class="info-container">
-
-                        {% if student.student_balance %}
-                            <p class="first">Остаток занятий: {{ student.student_balance.balance }}</p>
-                        {% else %}
-                            <p class="first">Остаток занятий: Не указан</p>
-                        {% endif %}
-                        <p class="last">Телефон: {{ student.phone_number }}</p>
-                    </div>
-{#                {% if student.photo %}#}
-{#                        <div class="image-container">#}
-{#                            <img class="img-article-students" src="{{ student.photo.url }}" alt="фото">#}
-{#                        </div>#}
-{##}
-{#                    {% endif %}#}
-            </li>
                 </div>
+            </li>
+                        {#                {% if student.photo %}#}
+                        {#                        <div class="image-container">#}
+                        {#                            <img class="img-article-students" src="{{ student.photo.url }}" alt="фото">#}
+                        {#                        </div>#}
+                        {##}
+                        {#                    {% endif %}#}
 
-        {% endfor %}
-    </ul>
+
+            {% endfor %}
+        </ul>
 {% endblock content %}

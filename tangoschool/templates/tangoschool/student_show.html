@@ -16,7 +16,7 @@
      <h2>Список операций с балансом:</h2>
     <ul>
         {% for operation in operations %}
-            <li>{{ operation.get_operation_type_display }} - {{ operation.date }} {{operation.time }}</li>
+            <li>{{ operation.get_operation_type_display }} - {{ operation.date|date:"d.m.Y (D)" }} {{operation.time }}</li>
         {% endfor %}
     </ul>
 {% endblock %}

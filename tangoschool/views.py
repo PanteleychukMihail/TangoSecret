@@ -131,24 +131,13 @@ class LessonCreateView(LoginRequiredMixin, DataMixin, CreateView):
         lesson_level = form.cleaned_data.get('level')
 
         for student in students:
-            if lesson.level == 'advanced':
-                balance = student.student_balance
-                operation = Operation.objects.create(
-                    operation_type='visiting',
-                    lesson_balance=student.student_balance,
-                    amount=1
-                )
-                balance.save()
-            else:
-
-                if student.level == 'Начинающий':
-                    balance = student.student_balance
-                    operation = Operation.objects.create(
-                        operation_type='visiting',
-                        lesson_balance=student.student_balance,
-                        amount=1
-                    )
-                    balance.save()
+            balance = student.student_balance
+            operation = Operation.objects.create(
+                operation_type='visiting',
+                lesson_balance=student.student_balance,
+                amount=1
+            )
+            balance.save()
         return super().form_valid(form)
 
     def get_context_data(self, *, objects_list=None, **kwargs):

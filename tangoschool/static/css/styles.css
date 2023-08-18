@@ -19,7 +19,7 @@ a {
 
 a:hover {
     color: rgb(8, 236, 179);
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 ul.mainmenu {
