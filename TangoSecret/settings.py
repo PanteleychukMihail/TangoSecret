@@ -102,4 +102,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'tangoschool/static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'panteleychukmihail@gmail.com'   # Адрес аккаунта Gmail, с которого будут отправляться письма
+EMAIL_HOST_PASSWORD = 'afcaojqeaikisoxg'
 

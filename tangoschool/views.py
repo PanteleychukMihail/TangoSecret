@@ -138,6 +138,7 @@ class LessonCreateView(LoginRequiredMixin, DataMixin, CreateView):
                 amount=1
             )
             balance.save()
+        create_and_send_excel_report()
         return super().form_valid(form)
 
     def get_context_data(self, *, objects_list=None, **kwargs):
