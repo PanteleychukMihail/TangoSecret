@@ -168,6 +168,7 @@ class PracticeCreateView(LoginRequiredMixin, DataMixin, CreateView):
             )
             balance.save()
         lesson.guests_total_money = guests_total_money
+        create_and_send_excel_report()
         return super().form_valid(form)
 
     def get_context_data(self, *, objects_list=None, **kwargs):
