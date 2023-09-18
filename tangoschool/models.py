@@ -129,8 +129,8 @@ class Lesson(models.Model):
     lesson_type = models.CharField(max_length=10, choices=(('full', 'Полное занятие'), ('practice', 'Практика')))
     students = models.ManyToManyField(Student, blank=True, verbose_name="Список учеников, записанных на занятие")
     guests = models.ManyToManyField(Guest, blank=True, verbose_name="Список гостей, записанных на занятие")
-    date = models.DateField(auto_now_add=True, verbose_name="Дата занятия")
-    time = models.TimeField(auto_now_add=True, verbose_name="Время занятия")
+    date = models.DateField(verbose_name="Дата занятия")
+    time = models.TimeField(verbose_name="Время занятия")
     level = models.CharField(max_length=30, choices=LEVEL_CHOICES, blank=True, null=True,
                              verbose_name="Уровень сложности")
     guests_total_money = models.IntegerField(blank=True, default=0, verbose_name="Сумма от гостей")

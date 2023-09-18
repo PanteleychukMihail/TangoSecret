@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.forms import widgets
+from datetime import date
 
 from .models import *
 
@@ -36,6 +38,8 @@ class AddLessonForm(forms.ModelForm):
         queryset=Student.objects.filter(is_active=True).order_by('-level', '-last_name'),
         widget=forms.CheckboxSelectMultiple,
         required=False)
+    date = forms.DateField(widget=widgets.SelectDateWidget(), label='Дата',initial=date.today())
+    time = forms.TimeField(widget=forms.TimeInput(format='%H.%M'), label='Время')
 
     def __init__(self, *args, **kwargs):
         super(AddLessonForm, self).__init__(*args, **kwargs)
@@ -45,7 +49,7 @@ class AddLessonForm(forms.ModelForm):
 
     class Meta:
         model = Lesson
-        fields = ['lesson_type', 'lesson_topic', 'trainer1', 'trainer2', 'level', 'students']
+        fields = ['date', 'time','lesson_type', 'lesson_topic', 'trainer1', 'trainer2', 'level', 'students']
 
 
 class AddPracticeForm(forms.ModelForm):
@@ -54,6 +58,8 @@ class AddPracticeForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+    date = forms.DateField(widget=widgets.SelectDateWidget(), label='Дата',initial=date.today())
+    time = forms.TimeField(widget=forms.TimeInput(format='%H.%M'), label='Время')
 
     guests = forms.ModelMultipleChoiceField(
         queryset=Guest.objects.all(), widget=forms.CheckboxSelectMultiple, required=False
@@ -66,7 +72,7 @@ class AddPracticeForm(forms.ModelForm):
 
     class Meta:
         model = Lesson
-        fields = ['lesson_type', 'students', 'guests']
+        fields = ['date', 'time', 'lesson_type', 'students', 'guests']
 
 # class UpdateUserForm(forms.ModelForm):
 #     model = User

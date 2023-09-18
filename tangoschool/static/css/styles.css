@@ -5,7 +5,23 @@ body {
     height: 100%;
     color: #fb7503;
     font-family: Michroma,serif;
-    background: linear-gradient(90deg, #150890 0%, #54ec08 100%);
+    background-color: #000;
+}
+.navbar {
+    background: #000; /* или background-color: black; */
+}
+
+
+#navbarNav.collapse.navbar-collapse {
+    background: #000; /* или background-color: black; */
+}
+
+#navbar navbar-expand-lg bg-light {
+    background: #000; /* или background-color: black; */
+}
+
+#site-container{
+    background: #000; /* или background-color: black; */
 }
 
 p {
@@ -27,7 +43,7 @@ ul.mainmenu {
     margin: 0;
     padding: 0;
     height: 70px;
-    background: linear-gradient(90deg, #150890 0%, #fffffe 100%);
+    background: #000;
     font-size: 20px;
     overflow: hidden;
 }
@@ -112,7 +128,7 @@ footer a {
 
 footer,
 .btn-primary {
-    background: linear-gradient(270deg, #150890 0%, #08f60c 100%);
+    background: #280101;
 }
 
 

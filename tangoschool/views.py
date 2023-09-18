@@ -63,6 +63,10 @@ class StudentsList(LoginRequiredMixin, DataMixin, ListView):
     context_object_name = 'students'
     login_url = reverse_lazy('home')
 
+    def get_queryset(self):
+        # Фильтруем учеников, у которых is_active=True
+        return Student.objects.filter(is_active=True)
+
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Список Студентов")
@@ -129,13 +133,17 @@ class LessonCreateView(LoginRequiredMixin, DataMixin, CreateView):
         lesson.trainer2 = form.cleaned_data.get('trainer2')
         students = form.cleaned_data.get('students')
         lesson_level = form.cleaned_data.get('level')
+        lesson.date = form.cleaned_data.get('date')
+        lesson.time = form.cleaned_data.get('time')
 
         for student in students:
             balance = student.student_balance
             operation = Operation.objects.create(
                 operation_type='visiting',
                 lesson_balance=student.student_balance,
-                amount=1
+                amount=1,
+                date=lesson.date,
+                time=lesson.time
             )
             balance.save()
         create_and_send_excel_report()
@@ -164,7 +172,10 @@ class PracticeCreateView(LoginRequiredMixin, DataMixin, CreateView):
             operation = Operation.objects.create(
                 operation_type='visiting',
                 lesson_balance=student.student_balance,
-                amount=0.5
+                amount=0.5,
+                date=lesson.date,
+                time=lesson.time
+
             )
             balance.save()
         lesson.guests_total_money = guests_total_money
