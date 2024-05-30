@@ -4,12 +4,12 @@ from io import BytesIO
 
 from .models import *
 
-menu = [{'title': 'Новый Ученик', 'url_name': 'add_student'},
-        {'title': 'Список учеников', 'url_name': 'users_list'},
-        {'title': 'Создать занятие', 'url_name': 'add_lesson'},
-        {'title': 'Создать практику', 'url_name': 'add_practice'},
-        {'title': 'Прошлые уроки', 'url_name': 'lessons_view'},
-        {'title': 'Редактировать профиль', 'url_name': 'user_update'}
+menu = [{'title': 'Новий учень', 'url_name': 'add_student'},
+        {'title': 'Перелік учнів', 'url_name': 'users_list'},
+        {'title': 'Створити заняття', 'url_name': 'add_lesson'},
+        {'title': 'Створити практику', 'url_name': 'add_practice'},
+        {'title': 'Минулі уроки', 'url_name': 'lessons_view'},
+        {'title': 'Редагувати профіль', 'url_name': 'user_update'}
         ]
 
 
@@ -52,7 +52,7 @@ def create_and_send_excel_report():
     subject = 'Отчет по остаткам занятий'
     message = 'Пожалуйста, найдите прикрепленный Excel-файл с остатками занятий.'
     from_email = 'panteleychukmihail@gmail.com'
-    recipient_list = ['kelton@kelton.com.ua']
+    recipient_list = ['TS@kelton.com.ua', 'Kosuchenko@gmail.com']
     file_name = 'report.xlsx'
 
     email = EmailMessage(subject, message, from_email, recipient_list)

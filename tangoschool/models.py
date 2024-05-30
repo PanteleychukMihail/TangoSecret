@@ -8,18 +8,18 @@ from django.utils import timezone
 from jedi.inference.value import instance
 
 LEVEL_CHOICES = (
-    ('beginner', 'Начинающий'),
-    ('advanced', 'Продолжающий'),
+    ('beginner', 'Початковий'),
+    ('advanced', 'Продовжуючий'),
 )
 
 
 class TrainerProfile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='trainer_profile')
-    email = models.EmailField(max_length=70, verbose_name="Почта")
-    birth_day = models.DateField(blank=True, null=True, verbose_name="День рождения")
-    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True, verbose_name="Номер телефона")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    email = models.EmailField(max_length=70, verbose_name="Пошта")
+    birth_day = models.DateField(blank=True, null=True, verbose_name="День народження")
+    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True, verbose_name="Номер телефону")
+    description = models.TextField(blank=True, verbose_name="Опис")
     experience = models.PositiveIntegerField(blank=True, null=True, verbose_name="Стаж в танго")
     photo = models.ImageField(upload_to='trainers/', blank=True, null=True, verbose_name="фото")
 
@@ -36,15 +36,15 @@ class TrainerProfile(models.Model):
 
 class Guest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    first_name = models.CharField(max_length=255, verbose_name="Имя")
-    last_name = models.CharField(max_length=255, verbose_name="Фамилия")
+    first_name = models.CharField(max_length=255, verbose_name="Ім'я")
+    last_name = models.CharField(max_length=255, verbose_name="Прізвище")
     email = models.EmailField(blank=True, verbose_name="Почта")
-    phone_number = models.CharField(max_length=20, blank=True, verbose_name="Номер телефона")
+    phone_number = models.CharField(max_length=20, blank=True, verbose_name="Номер телефону")
     photo = models.ImageField(upload_to='students/', blank=True, null=True, verbose_name="фото")
 
     class Meta:
-        verbose_name = "Гость"
-        verbose_name_plural = "Гости"
+        verbose_name = "Гість"
+        verbose_name_plural = "Гості"
 
     def __str__(self):
         return f'{self.last_name} {self.first_name}'
@@ -52,11 +52,11 @@ class Guest(models.Model):
 
 class Account(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    balance = models.FloatField(blank=True, null=True, default=0, verbose_name="Остаток занятий")
+    balance = models.FloatField(blank=True, null=True, default=0, verbose_name="Залишок занять")
 
     class Meta:
-        verbose_name = 'Учетная запись'
-        verbose_name_plural = 'Учетные записи'
+        verbose_name = 'Обліковий запис'
+        verbose_name_plural = 'Облікові записи'
 
     def __str__(self):
         students = ", ".join([str(student) for student in self.students.all()])
@@ -73,8 +73,8 @@ class Operation(models.Model):
     amount = models.FloatField(default=1, verbose_name="количество за раз")
 
     class Meta:
-        verbose_name = 'Операция с балансом'
-        verbose_name_plural = 'Операции с балансом'
+        verbose_name = 'Операція з балансом'
+        verbose_name_plural = 'Операції з балансом'
 
     def student_name(self):
         names = self.lesson_balance.students.values_list('last_name', flat=True)
@@ -95,15 +95,15 @@ class Operation(models.Model):
 
 class Student(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    first_name = models.CharField(max_length=25, verbose_name="Имя")
-    last_name = models.CharField(max_length=50, verbose_name="Фамилия")
-    email = models.EmailField(max_length=70, null=True, blank=True, verbose_name="Почта")
-    birth_day = models.DateField(blank=True, null=True, verbose_name="День рождения")
-    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True, verbose_name="Номер телефона")
+    first_name = models.CharField(max_length=25, verbose_name="Ім'я")
+    last_name = models.CharField(max_length=50, verbose_name="Прізвище")
+    email = models.EmailField(max_length=70, null=True, blank=True, verbose_name="Пошта")
+    birth_day = models.DateField(blank=True, null=True, verbose_name="День народження")
+    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True, verbose_name="Номер телефону")
     photo = models.ImageField(upload_to='students/', blank=True, null=True, verbose_name="фото")
     level = models.CharField(max_length=30, choices=LEVEL_CHOICES,
-                             blank=True, null=True, verbose_name="Уровень подготовки")
-    is_active = models.BooleanField(default=True, verbose_name="Статус активности", editable=True)
+                             blank=True, null=True, verbose_name="Рівень підготовки")
+    is_active = models.BooleanField(default=True, verbose_name="Статус активності", editable=True)
     student_balance = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="students")
 
     class Meta:
@@ -121,19 +121,19 @@ class Student(models.Model):
 
 class Lesson(models.Model):
     id = models.AutoField(primary_key=True)
-    lesson_topic = models.CharField(max_length=30, blank=True, null=True, verbose_name="Тема занятия")
+    lesson_topic = models.CharField(max_length=30, blank=True, null=True, verbose_name="Тема заняття")
     trainer1 = models.ForeignKey(TrainerProfile, on_delete=models.DO_NOTHING, null=True, blank=True,
                                  related_name='lessons_as_trainer1', verbose_name="Тренер 1")
     trainer2 = models.ForeignKey(TrainerProfile, on_delete=models.DO_NOTHING, null=True, blank=True,
                                  related_name='lessons_as_trainer2', verbose_name="Тренер 2")
-    lesson_type = models.CharField(max_length=10, choices=(('full', 'Полное занятие'), ('practice', 'Практика')))
-    students = models.ManyToManyField(Student, blank=True, verbose_name="Список учеников, записанных на занятие")
-    guests = models.ManyToManyField(Guest, blank=True, verbose_name="Список гостей, записанных на занятие")
-    date = models.DateField(verbose_name="Дата занятия")
-    time = models.TimeField(verbose_name="Время занятия")
+    lesson_type = models.CharField(max_length=10, choices=(('full', 'Повне заняття'), ('practice', 'Практика')))
+    students = models.ManyToManyField(Student, blank=True, verbose_name="Список учнів, записанных на заняття")
+    guests = models.ManyToManyField(Guest, blank=True, verbose_name="Список гостей, записанных на заняття")
+    date = models.DateField(verbose_name="Дата заняття")
+    time = models.TimeField(verbose_name="Время заняття")
     level = models.CharField(max_length=30, choices=LEVEL_CHOICES, blank=True, null=True,
-                             verbose_name="Уровень сложности")
-    guests_total_money = models.IntegerField(blank=True, default=0, verbose_name="Сумма от гостей")
+                             verbose_name="Рівень складності")
+    guests_total_money = models.IntegerField(blank=True, default=0, verbose_name="Сумма від гостей")
 
     class Meta:
         verbose_name = "урок"

@@ -5,12 +5,12 @@
 
 
     <h2> Дата: {{ lesson.date }} </h2>
-    <h2> Время {{ lesson.time }} </h2>
+    <h2> Час {{ lesson.time }} </h2>
     {% if lesson.lesson_type %}
-    <h2>Тип урока: {{ lesson.get_lesson_type_display }}</h2>
+    <h2>Тип уроку: {{ lesson.get_lesson_type_display }}</h2>
     {% endif %}
     {% if lesson.level %}
-       <h2> Уровень: {{ lesson.get_level_display }}</h2>
+       <h2> Ріень: {{ lesson.get_level_display }}</h2>
     {% endif %}
     {% if lesson.trainer1 %}
     <h2>Тренер 1: {{ lesson.trainer1 }} </h2>
@@ -19,22 +19,24 @@
     <h2>Тренер 2: {{ lesson.trainer2 }} </h2>
     {% endif %}
     {% if lesson.lesson_topic %}
-    <h2>Тема урока:{{ lesson.lesson_topic }}</h2>
+    <h2>Тема уроку:{{ lesson.lesson_topic }}</h2>
     {% endif %}
 
    <hr>
 
-    <h1> Студенты:</h1>
+    <h1> Студенти:</h1>
     {% for student in students %}
-      <h3> {{ student }} </h3>
+      <h3> {{ forloop.counter }}. {{ student }} </h3>
+
    {% endfor %}
     <hr>
 
     {% if guests %}
 <h1> Гости </h1>
     {% for guest in guests %}
-    <h3>{{guest}}</h3>
+    <h3> {{ forloop.counter }}. {{ guest }} </h3>
+
     {% endfor %}
-     <h2>Сумма от гостей: {{ lesson.guests_total_money }}</h2>
+     <h2>Сумма від гостей: {{ lesson.guests_total_money }}</h2>
     {% endif %}
 {% endblock %}

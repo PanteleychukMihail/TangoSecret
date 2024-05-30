@@ -4,10 +4,10 @@
     <h2>{{ title }}</h2>
     <ul class="list-articles">
         <h5>
-            <span style="display: inline-block; width: 200px;"> Фамилия</span>
-            <span style="display: inline-block; width: 200px;"> Имя </span>
-            <span style="display: inline-block; width: 150px;"> Уровень </span>
-            <span style="display: inline-block; width: 200px;"> Остаток занятий </span>
+            <span style="display: inline-block; width: 200px;"> Прізвище</span>
+            <span style="display: inline-block; width: 200px;"> Ім'я </span>
+            <span style="display: inline-block; width: 150px;"> Рівень </span>
+            <span style="display: inline-block; width: 200px;"> Залишок занять </span>
         </h5>
 
 
@@ -15,7 +15,7 @@
             {% for student in students %}
                 <li>
                 <div class="article-panel">
-                    <a href="{{ student.get_absolute_url }}">
+                   <a href="{{ student.get_absolute_url }}" class="{% if student.level == 'beginner' %}level-beginner{% else %}level-advanced{% endif %}">
                         <h5>
                                 <span style="display: inline-block; width: 200px;">{{ student.last_name }}</span>
                                 <span style="display: inline-block; width: 200px;">{{ student.first_name }}</span>

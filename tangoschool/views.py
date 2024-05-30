@@ -53,7 +53,7 @@ class AddStudent(LoginRequiredMixin, DataMixin, CreateView):
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Добавить студента")
+        c_def = self.get_user_context(title="Додати учня")
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -69,7 +69,7 @@ class StudentsList(LoginRequiredMixin, DataMixin, ListView):
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Список Студентов")
+        c_def = self.get_user_context(title="Список учнів")
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -80,7 +80,7 @@ class ShowStudent(LoginRequiredMixin, DataMixin, DetailView):
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Информация о студенте")
+        c_def = self.get_user_context(title="Информація про учня")
         student = self.get_object()
         operations = student.student_balance.operations.all().order_by('-date', '-time')
         balance = student.student_balance
@@ -97,7 +97,7 @@ class BuyLessonsView(DataMixin, View):
     def get(self, request, pk):
         student = Student.objects.get(pk=pk)
         context = {
-            'title': f'Покупка занятий для ученика {student}',
+            'title': f'Купівля занять для учня {student}',
             'form': self.form_class()
         }
         return render(request, self.template_name, context)
@@ -151,7 +151,7 @@ class LessonCreateView(LoginRequiredMixin, DataMixin, CreateView):
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Добавить занятие")
+        c_def = self.get_user_context(title="Додати заняття")
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -165,7 +165,7 @@ class PracticeCreateView(LoginRequiredMixin, DataMixin, CreateView):
         lesson = form.save(commit=False)
         students = form.cleaned_data.get('students')
         guests = form.cleaned_data.get('guests')
-        guests_total_money = len(guests) * 75
+        guests_total_money = len(guests) * 100
 
         for student in students:
             balance = student.student_balance
@@ -184,7 +184,7 @@ class PracticeCreateView(LoginRequiredMixin, DataMixin, CreateView):
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Добавить занятие")
+        c_def = self.get_user_context(title="Додати практику")
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -195,7 +195,7 @@ class LessonsViews(LoginRequiredMixin, DataMixin, ListView):
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Список занятий")
+        c_def = self.get_user_context(title="Список занять")
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -211,7 +211,7 @@ class LessonShow(LoginRequiredMixin, DataMixin, DetailView):
         guests = lesson.guests.all()
         context['students'] = students
         context['guests'] = guests
-        c_def = self.get_user_context(title="Информация об уроке")
+        c_def = self.get_user_context(title="Информаці про урок")
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -221,7 +221,7 @@ class LoginUser(DataMixin, LoginView):
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Авторизация")
+        c_def = self.get_user_context(title="Авторизація")
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_success_url(self):

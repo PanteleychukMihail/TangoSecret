@@ -51,10 +51,6 @@ class StudentAdmin(admin.ModelAdmin):
             initial_balance = 0
         lesson_balance = form.cleaned_data.get('student_balance')
         if not lesson_balance:
-            lesson_balance = Account.objects.create()
-            lesson_balance.save()
-            obj.student_balance = lesson_balance
-
             super().save_model(request, obj, form, change)
 
             if initial_balance > 0:

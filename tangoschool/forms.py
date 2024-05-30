@@ -7,20 +7,26 @@ from .models import *
 
 
 class LoginUserForm(AuthenticationForm):
-    username = forms.CharField(label='Пользователь', widget=forms.TextInput(attrs={'class': 'form-input'}))
+    username = forms.CharField(label='Користувач', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Пароль', widget=forms.TextInput(attrs={'class': 'form-input'}))
 
 
 class AddStudentForm(forms.ModelForm):
-    balance_choice = forms.ChoiceField(label='Тип учетной записи',
-                                       choices=[('new', 'Создать новую учетную запись'),
-                                                ('existing', 'Выбрать существующую')],
-                                       widget=forms.RadioSelect  # Используем радиокнопки для выбора
-                                       )
-    existing_balance = forms.ModelChoiceField(label='Тип учетной записи', queryset=Account.objects.all(),
+    BALANCE_CHOICES = [
+        ('new', 'Створити новий обліковий запис'),
+        ('existing', 'Обрати існуючий')
+    ]
+
+    balance_choice = forms.ChoiceField(
+        label='Тип облікового запису',
+        choices=BALANCE_CHOICES,
+        widget=forms.RadioSelect,
+        initial='new'  # Установим по умолчанию выбор "Создать новую"
+    )
+    existing_balance = forms.ModelChoiceField(label='Тип облікового запису', queryset=Account.objects.all(),
                                               required=False,  # Делаем поле необязательным
-                                              empty_label='Выберите учетную запись')
-    initial_balance = forms.IntegerField(required=False, label='Начальный баланс', initial=0)
+                                              empty_label='Оберіть облиіковий запис')
+    initial_balance = forms.IntegerField(required=False, label='Початковий баланс', initial=0)
 
     class Meta:
         model = Student
@@ -28,24 +34,25 @@ class AddStudentForm(forms.ModelForm):
 
 
 class BuyLessonsForm(forms.Form):
-    lessons = forms.IntegerField(label='Количество занятий')
+    lessons = forms.FloatField(label='Кількість занять')
 
 
 class AddLessonForm(forms.ModelForm):
-    level = forms.ChoiceField(label='Уровень группы', choices=LEVEL_CHOICES, widget=forms.RadioSelect, required=True)
+    level = forms.ChoiceField(label='Рівень группы', choices=LEVEL_CHOICES, widget=forms.RadioSelect, required=True)
     students = forms.ModelMultipleChoiceField(
-        label='Ученики',
+        label='Учні',
         queryset=Student.objects.filter(is_active=True).order_by('-level', '-last_name'),
         widget=forms.CheckboxSelectMultiple,
         required=False)
-    date = forms.DateField(widget=widgets.SelectDateWidget(), label='Дата',initial=date.today())
-    time = forms.TimeField(widget=forms.TimeInput(format='%H.%M'), label='Время')
+    date = forms.DateField(widget=forms.SelectDateWidget(), label='Дата')
+    time = forms.TimeField(widget=forms.TimeInput(format='%H.%M'), label='Час')
 
     def __init__(self, *args, **kwargs):
         super(AddLessonForm, self).__init__(*args, **kwargs)
         self.fields['level'].initial = 'advanced'
         self.fields['lesson_type'].widget = forms.HiddenInput()
         self.fields['lesson_type'].initial = 'full'
+        self.fields['date'].initial = date.today()
 
     class Meta:
         model = Lesson
@@ -59,7 +66,7 @@ class AddPracticeForm(forms.ModelForm):
         required=False
     )
     date = forms.DateField(widget=widgets.SelectDateWidget(), label='Дата',initial=date.today())
-    time = forms.TimeField(widget=forms.TimeInput(format='%H.%M'), label='Время')
+    time = forms.TimeField(widget=forms.TimeInput(format='%H.%M'), label='Час')
 
     guests = forms.ModelMultipleChoiceField(
         queryset=Guest.objects.all(), widget=forms.CheckboxSelectMultiple, required=False
@@ -69,6 +76,7 @@ class AddPracticeForm(forms.ModelForm):
         super(AddPracticeForm, self).__init__(*args, **kwargs)
         self.fields['lesson_type'].widget = forms.HiddenInput()
         self.fields['lesson_type'].initial = 'practice'
+        self.fields['date'].initial = date.today()
 
     class Meta:
         model = Lesson

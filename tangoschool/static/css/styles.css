@@ -33,9 +33,18 @@ a {
     text-decoration: none;
 }
 
+
 a:hover {
     color: rgb(8, 236, 179);
     text-decoration: none;
+}
+
+.level-beginner {
+    color: green; /* Цвет для начинающих студентов */
+}
+
+.level-advanced {
+    color: red; /* Цвет для продвинутых студентов */
 }
 
 ul.mainmenu {
